@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=payment-methods" />
   </head>
   <body>
     <main class="app-shell">
@@ -119,13 +119,23 @@
           <strong data-i18n="total">Total</strong>
           <strong id="cart-total">$0 USD</strong>
         </div>
-        <button class="checkout" id="cart-checkout" type="button" data-i18n="checkout">Continuar con Cash App</button>
-        <div class="payment-panel" id="payment-panel" aria-label="Pago con Cash App" aria-hidden="true">
+        <button class="checkout" id="cart-checkout" type="button" data-i18n="checkout">Elegir método de pago</button>
+        <div class="payment-panel" id="payment-panel" aria-label="Métodos de pago" aria-hidden="true">
           <p class="eyebrow" data-i18n="paymentMethod">Método de pago</p>
-          <h2 data-i18n="payCashApp">Paga con Cash App</h2>
-          <p class="payment-copy" data-i18n="paymentCopy">Envía el total de tu pedido a este identificador de Cash App:</p>
-          <code class="cashapp-tag">$SocialRise</code>
-          <p class="payment-link"><a id="cashapp-link" href="https://cash.app/$SocialRise" target="_blank" rel="noopener">cash.app/$SocialRise</a></p>
+          <h2 data-i18n="choosePayment">Elige cómo pagar</h2>
+          <div class="payment-methods" role="group" data-i18n-aria="paymentMethod">
+            <button class="payment-method active" type="button" data-payment-method="cashapp">Cash App</button>
+            <button class="payment-method" type="button" data-payment-method="binance">Binance BNB</button>
+            <button class="payment-method" type="button" data-payment-method="paypal">PayPal</button>
+          </div>
+          <div class="payment-instructions">
+            <h3 id="payment-title">Paga con Cash App</h3>
+            <p class="payment-copy" id="payment-copy">Envía el total de tu pedido a este identificador de Cash App:</p>
+            <code class="cashapp-tag" id="cashapp-tag">$SocialRise</code>
+            <img class="payment-qr" id="binance-qr" src="assets/binance-bnb-qr.jpeg" alt="Código QR para pagar con Binance BNB" hidden />
+            <img class="payment-qr" id="paypal-qr" src="assets/paypal-qr.jpeg" alt="Código QR para pagar con PayPal" hidden />
+            <p class="payment-link" id="cashapp-link-wrap"><a id="cashapp-link" href="https://cash.app/$SocialRise" target="_blank" rel="noopener">cash.app/$SocialRise</a></p>
+          </div>
           <div class="payment-total"><span>Total a enviar</span><strong id="payment-total">$0 USD</strong></div>
           <a class="cashapp-button" id="cashapp-open" href="https://cash.app/$SocialRise" target="_blank" rel="noopener" data-i18n="openCashApp">Abrir Cash App</a>
           <button class="receipt-button" id="receipt-button" type="button" data-i18n="sendReceipt">Enviar comprobante por WhatsApp</button>
@@ -142,7 +152,7 @@
       <footer class="footer-note"><strong>♛ SocialRise</strong><small>Más visibilidad. Más oportunidades.</small></footer>
     </main>
     <audio id="background-music" loop preload="auto" autoplay muted playsinline>
-      <source src="https://archive.org/download/Electronic_1224-21753/Podington_Bear_-_Automatic.mp3" type="audio/mpeg" />
+      <source src="https://archive.org/download/Acid_Stasi_House-10871/Noise_to_Silence_-_10_-_Fire_Drum_for_Free.mp3" type="audio/mpeg" />
     </audio>
     <script src="script.js?v=cart-shop"></script>
   </body>

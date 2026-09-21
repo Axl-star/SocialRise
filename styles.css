@@ -433,7 +433,47 @@ h1 {
 .payment-panel.is-open { display: block; }
 .payment-panel .eyebrow { color: #159447; }
 .payment-panel h2 { margin: 4px 0 8px; font-size: 1.55rem; }
+.payment-methods {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin: 14px 0;
+}
+.payment-method {
+  min-height: 42px;
+  padding: 7px 5px;
+  border: 1px solid #c9d5e2;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #344054;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+.payment-method:hover,
+.payment-method.active {
+  border-color: #159447;
+  background: #e4f8e9;
+  color: #155d2b;
+}
+.payment-instructions {
+  min-height: 130px;
+  padding: 13px;
+  border: 1px solid #d8e2eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+.payment-instructions h3 { margin: 0 0 7px; font-size: 1.05rem; }
 .payment-copy { margin: 0 auto 14px; max-width: 32rem; color: #42516a; line-height: 1.45; }
+.payment-qr {
+  display: block;
+  width: min(210px, 100%);
+  aspect-ratio: 1;
+  margin: 10px auto 0;
+  border: 1px solid #d8e2eb;
+  border-radius: 10px;
+  object-fit: cover;
+}
 .cashapp-tag {
   display: inline-block;
   margin: 2px 0 6px;
@@ -475,6 +515,10 @@ h1 {
 
 .cashapp-button { background: #17c94f; color: #fff; }
 .receipt-button { margin-top: 9px; background: #050505; color: #fff; }
+.cashapp-tag[hidden],
+.payment-qr[hidden],
+.cashapp-button[hidden],
+.payment-link[hidden] { display: none !important; }
 .payment-note { display: block; margin-top: 12px; color: #667085; line-height: 1.35; }
 
 .shop-empty {
@@ -529,7 +573,7 @@ h1 {
   background: rgba(255, 255, 255, 0.18);
 }
 
-.type-tabs, .offer-grid { display: grid; gap: 8px; }
+.type-tabs { display: grid; gap: 8px; }
 .type-tabs { grid-template-columns: repeat(3, 1fr); margin-bottom: 10px; }
 .type-tab {
   padding: 10px;
@@ -541,28 +585,97 @@ h1 {
   font-size: 0.8rem;
 }
 .type-tab.active { border-color: #ffffff; background: rgba(255, 255, 255, 0.22); color: #ffffff; }
-.offer-grid { grid-template-columns: repeat(5, 1fr); }
-.offer {
-  padding: 12px 8px;
+.custom-order {
+  padding: 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.16);
-  color: #050505;
-  text-align: left;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
 }
-.offer:hover { border-color: #ffffff; }
-.offer strong, .offer span { display: block; }
-.offer strong { color: #ffffff; font-size: 0.78rem; }
-.offer span { margin-top: 4px; color: #174ea6; font-size: 0.88rem; font-weight: 900; }
-.offer small { display: block; margin-top: 4px; color: rgba(255, 255, 255, 0.78); font-size: 0.65rem; }
-.offer em {
+.custom-order label {
   display: block;
-  margin-top: 8px;
+  margin-bottom: 7px;
   color: #ffffff;
-  font-size: 0.66rem;
-  font-style: normal;
-  font-weight: 900;
+  font-size: 0.78rem;
+  font-weight: 800;
 }
+.custom-order input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #111827;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+}
+.quantity-control {
+  position: relative;
+}
+.quantity-control input { padding-right: 86px; }
+.quantity-control span {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  color: #465166;
+  font-size: 0.72rem;
+  font-weight: 800;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.quantity-help {
+  display: block;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+.price-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+}
+.price-summary strong {
+  color: #77f2a0;
+  font-size: 1.15rem;
+}
+.price-details {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.7rem;
+}
+.price-details b { color: #ffffff; }
+.price-details #saving-line { color: #ffd166; text-align: right; }
+.discount-note {
+  display: block;
+  min-height: 16px;
+  margin-top: 5px;
+  color: #ffd166;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.add-custom-order {
+  width: 100%;
+  margin-top: 9px;
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #08001d;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+.add-custom-order:hover { background: #d9f7ff; }
 
 .cart-bar {
   display: flex;
@@ -601,7 +714,6 @@ h1 {
   .network-grid { grid-template-columns: repeat(2, 1fr); }
   .network-icon svg { width: 68px; height: 68px; }
   .network-button { min-width: 90px; }
-  .offer-grid { grid-template-columns: repeat(2, 1fr); }
   .shop-panel { min-height: 225px; }
 }
 

@@ -11,15 +11,27 @@ const paymentPanel = document.querySelector('#payment-panel');
 const paymentTotal = document.querySelector('#payment-total');
 const cashAppLink = document.querySelector('#cashapp-link');
 const cashAppOpen = document.querySelector('#cashapp-open');
+const cashAppTag = document.querySelector('#cashapp-tag');
+const cashAppLinkWrap = document.querySelector('#cashapp-link-wrap');
+const paymentTitle = document.querySelector('#payment-title');
+const paymentCopy = document.querySelector('#payment-copy');
+const binanceQr = document.querySelector('#binance-qr');
+const paypalQr = document.querySelector('#paypal-qr');
+const paymentMethodButtons = document.querySelectorAll('.payment-method');
 const receiptButton = document.querySelector('#receipt-button');
 const musicToggle = document.querySelector('#music-toggle');
 const musicLabel = document.querySelector('#music-label');
 const musicSymbol = document.querySelector('#music-symbol');
 const backgroundMusic = document.querySelector('#background-music');
 const languageToggle = document.querySelector('#language-toggle');
-const offers = [500, 1000, 2000, 5000, 10000];
+const baseUnits = 10000;
+const basePrice = 90;
+const orderDiscountThreshold = 90;
+const orderDiscountPercentage = 30;
+const viewsPriceMultiplier = 0.5;
 let selectedNetwork = '';
 let selectedType = 'Seguidores';
+let selectedPaymentMethod = 'cashapp';
 const cart = [];
 const musicPreferenceKey = 'socialrise-music-enabled';
 const languageKey = 'socialrise-language';
@@ -35,14 +47,22 @@ const translations = {
     easy: 'Fácil', simple: 'Sin complicaciones.', choosePlatform: 'Selecciona una plataforma',
     whichPlatform: '¿Qué plataforma quieres', grow: 'hacer crecer?', buy: '🛒 Comprar',
     supportLine: 'Compra segura · Atención por WhatsApp', contact: '◔ Contactar',
-    yourOrder: 'Tu pedido', total: 'Total', checkout: 'Continuar con Cash App',
+    yourOrder: 'Tu pedido', total: 'Total', checkout: 'Elegir método de pago',
     paymentMethod: 'Método de pago', payCashApp: 'Paga con Cash App',
     paymentCopy: 'Envía el total de tu pedido a este identificador de Cash App:',
     openCashApp: 'Abrir Cash App', sendReceipt: 'Enviar comprobante por WhatsApp',
     paymentNote: 'Después del pago, envía el comprobante para validar y procesar tu pedido.',
+    choosePayment: 'Elige cómo pagar', payBinance: 'Paga con Binance BNB', payPayPal: 'Paga con PayPal',
+    binanceCopy: 'Escanea este código QR desde Binance Pay y envía el total en BNB.',
+    paypalCopy: 'Escanea este código QR con la cámara o la app de PayPal para enviar el total.',
+    scanQr: 'Escanea el código QR',
     chooseService: 'Selecciona un servicio', followers: 'Seguidores', likes: 'Likes', views: 'Vistas',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
-    emptyCart: 'Tu carrito está vacío.', addPackage: 'Agrega al menos un paquete al carrito.'
+    quantity: '¿Cuántos quieres?', baseRate: '10.000 por $90 · $0,90 por cada 100', viewsRate: '10.000 vistas por $45 · $0,45 por cada 100', discount: 'Descuento automático',
+    discountFrom: 'desde', serviceAdded: 'Servicio añadido al carrito',
+    emptyCart: 'Tu carrito está vacío.', addPackage: 'Agrega al menos un paquete al carrito.',
+    priceFor: 'Precio para tu pedido', regularPrice: 'Precio regular', youSave: 'Ahorras',
+    discountTiers: '30% en pedidos superiores a $90', minimumQuantity: 'Mínimo 100', units: 'unidades'
   },
   en: {
     navServices: 'Services', navPrices: 'Pricing', navContact: 'Contact', cart: 'Cart',
@@ -52,14 +72,22 @@ const translations = {
     easy: 'Easy', simple: 'No complications.', choosePlatform: 'Choose a platform',
     whichPlatform: 'Which platform do you want to', grow: 'grow?', buy: '🛒 Shop',
     supportLine: 'Secure shopping · WhatsApp support', contact: '◔ Contact',
-    yourOrder: 'Your order', total: 'Total', checkout: 'Continue with Cash App',
+    yourOrder: 'Your order', total: 'Total', checkout: 'Choose payment method',
     paymentMethod: 'Payment method', payCashApp: 'Pay with Cash App',
     paymentCopy: 'Send your order total to this Cash App handle:',
     openCashApp: 'Open Cash App', sendReceipt: 'Send receipt on WhatsApp',
     paymentNote: 'After paying, send the receipt so we can validate and process your order.',
+    choosePayment: 'Choose how to pay', payBinance: 'Pay with Binance BNB', payPayPal: 'Pay with PayPal',
+    binanceCopy: 'Scan this QR code in Binance Pay and send the total in BNB.',
+    paypalCopy: 'Scan this QR code with your camera or the PayPal app to send the total.',
+    scanQr: 'Scan the QR code',
     chooseService: 'Choose a service', followers: 'Followers', likes: 'Likes', views: 'Views',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
-    emptyCart: 'Your cart is empty.', addPackage: 'Add at least one package to the cart.'
+    quantity: 'How many do you want?', baseRate: '10,000 for $90 · $0.90 per 100', viewsRate: '10,000 views for $45 · $0.45 per 100', discount: 'Automatic discount',
+    discountFrom: 'from', serviceAdded: 'Service added to cart',
+    emptyCart: 'Your cart is empty.', addPackage: 'Add at least one package to the cart.',
+    priceFor: 'Your order price', regularPrice: 'Regular price', youSave: 'You save',
+    discountTiers: '30% on orders above $90', minimumQuantity: 'Minimum 100', units: 'units'
   }
 };
 
@@ -80,6 +108,7 @@ function applyTranslations() {
   languageToggle.setAttribute('aria-label', language === 'es' ? 'Switch to English' : 'Cambiar a español');
   if (selectedNetwork) renderShop();
   renderCart();
+  updatePaymentMethod(selectedPaymentMethod);
 }
 
 function updateMusicButton() {
@@ -112,12 +141,53 @@ function setMusicState(shouldPlay) {
 }
 
 function money(value) {
-  return `$${value} USD`;
+  return `$${value.toFixed(2)} USD`;
+}
+
+function getRateDescription(type) {
+  return type === 'Vistas' ? t('viewsRate') : t('baseRate');
+}
+
+function getRegularPrice(amount, type) {
+  const multiplier = type === 'Vistas' ? viewsPriceMultiplier : 1;
+  return (amount / baseUnits) * basePrice * multiplier;
+}
+
+function getDiscountPercentage(amount, type) {
+  return getRegularPrice(amount, type) > orderDiscountThreshold ? orderDiscountPercentage : 0;
+}
+
+function getPrice(amount, type) {
+  const discount = getDiscountPercentage(amount, type);
+  return getRegularPrice(amount, type) * (1 - discount / 100);
+}
+
+function paymentMethodName(method = selectedPaymentMethod) {
+  return method === 'binance' ? 'Binance BNB' : method === 'paypal' ? 'PayPal' : 'Cash App';
+}
+
+function updatePaymentMethod(method) {
+  selectedPaymentMethod = method;
+  const isCashApp = method === 'cashapp';
+  const isBinance = method === 'binance';
+
+  paymentMethodButtons.forEach((button) => {
+    const isSelected = button.dataset.paymentMethod === method;
+    button.classList.toggle('active', isSelected);
+    button.setAttribute('aria-pressed', String(isSelected));
+  });
+
+  paymentTitle.textContent = isCashApp ? t('payCashApp') : isBinance ? t('payBinance') : t('payPayPal');
+  paymentCopy.textContent = isCashApp ? t('paymentCopy') : isBinance ? t('binanceCopy') : t('paypalCopy');
+  cashAppTag.hidden = !isCashApp;
+  cashAppLinkWrap.hidden = !isCashApp;
+  cashAppOpen.hidden = !isCashApp;
+  binanceQr.hidden = !isBinance;
+  paypalQr.hidden = method !== 'paypal';
 }
 
 function renderShop() {
   shopPanel.classList.add('is-visible');
-  const price = (amount) => amount / 100;
   shopPanel.innerHTML = `
     <div class="shop-heading">
       <div>
@@ -131,15 +201,23 @@ function renderShop() {
       <button class="type-tab ${selectedType === 'Likes' ? 'active' : ''}" data-type="Likes">${t('likes')}</button>
       <button class="type-tab ${selectedType === 'Vistas' ? 'active' : ''}" data-type="Vistas">${t('views')}</button>
     </div>
-    <div class="offer-grid">
-      ${offers.map((amount) => `
-        <button class="offer" data-amount="${amount}">
-          <strong>${amount.toLocaleString('en-US')}</strong>
-          <small>${typeLabel(selectedType)}</small>
-          <span>${money(price(amount))}</span>
-          <em>${t('addToCart')}</em>
-        </button>
-      `).join('')}
+    <div class="custom-order">
+      <label for="service-quantity">${t('quantity')} (${typeLabel(selectedType)})</label>
+      <div class="quantity-control">
+        <input id="service-quantity" type="number" min="100" step="100" value="10000" inputmode="numeric" aria-describedby="quantity-help" />
+        <span>${t('units')}</span>
+      </div>
+      <small id="quantity-help" class="quantity-help">${t('minimumQuantity')} · ${getRateDescription(selectedType)}</small>
+      <div class="price-summary">
+        <span>${t('priceFor')}</span>
+        <strong id="calculated-price">${money(getPrice(baseUnits, selectedType))}</strong>
+      </div>
+      <div class="price-details">
+        <span>${t('regularPrice')} <b id="regular-price">${money(getRegularPrice(baseUnits, selectedType))}</b></span>
+        <span id="saving-line" hidden>${t('youSave')} <b id="saving-price">$0.00 USD</b></span>
+      </div>
+      <small class="discount-note" id="discount-note">${t('discount')}: 0% · ${t('discountTiers')}</small>
+      <button class="add-custom-order" type="button">${t('addToCart')}</button>
     </div>
     <div class="cart-bar">
       <div><strong>${t('quickBuy')}</strong><span> · ${selectedNetwork} · ${typeLabel(selectedType)}</span></div>
@@ -160,12 +238,35 @@ function renderShop() {
     });
   });
 
-  shopPanel.querySelectorAll('.offer').forEach((button) => {
-    button.addEventListener('click', () => {
-      const amount = Number(button.dataset.amount);
-      cart.push({ network: selectedNetwork, type: selectedType, amount, price: amount / 100 });
-      renderCart();
-    });
+  const quantityInput = shopPanel.querySelector('#service-quantity');
+  const calculatedPrice = shopPanel.querySelector('#calculated-price');
+  const regularPrice = shopPanel.querySelector('#regular-price');
+  const savingLine = shopPanel.querySelector('#saving-line');
+  const savingPrice = shopPanel.querySelector('#saving-price');
+  const discountNote = shopPanel.querySelector('#discount-note');
+  const updatePrice = () => {
+    const amount = Math.max(0, Number(quantityInput.value) || 0);
+    const discount = getDiscountPercentage(amount, selectedType);
+    const standard = getRegularPrice(amount, selectedType);
+    const price = getPrice(amount, selectedType);
+    calculatedPrice.textContent = money(price);
+    regularPrice.textContent = money(standard);
+    savingPrice.textContent = money(standard - price);
+    savingLine.hidden = discount === 0;
+    discountNote.textContent = `${t('discount')}: ${discount}% · ${t('discountTiers')}`;
+  };
+
+  quantityInput.addEventListener('input', updatePrice);
+  shopPanel.querySelector('.add-custom-order').addEventListener('click', () => {
+    const amount = Math.floor(Number(quantityInput.value) || 0);
+    if (amount < 100) {
+      quantityInput.setCustomValidity('La cantidad mínima es 100.');
+      quantityInput.reportValidity();
+      return;
+    }
+    quantityInput.setCustomValidity('');
+    cart.push({ network: selectedNetwork, type: selectedType, amount, price: getPrice(amount, selectedType) });
+    renderCart();
   });
 
   shopPanel.querySelector('.checkout').addEventListener('click', () => {
@@ -240,12 +341,17 @@ cartCheckout.addEventListener('click', () => {
   cashAppOpen.href = cashAppUrl;
   paymentPanel.classList.add('is-open');
   paymentPanel.setAttribute('aria-hidden', 'false');
+  updatePaymentMethod(selectedPaymentMethod);
+});
+
+paymentMethodButtons.forEach((button) => {
+  button.addEventListener('click', () => updatePaymentMethod(button.dataset.paymentMethod));
 });
 
 function orderMessage() {
   const summary = cart.map((item) => `${item.network}: ${item.amount.toLocaleString('en-US')} ${item.type} - ${money(item.price)}`).join('\n');
   const total = cart.reduce((sum, item) => sum + item.price, 0);
-  return `Hola SocialRise, ya realicé el pago por Cash App de mi pedido:\n${summary}\nTotal enviado: ${money(total)}\nMi usuario/enlace: `;
+  return `Hola SocialRise, ya realicé el pago por ${paymentMethodName()} de mi pedido:\n${summary}\nTotal enviado: ${money(total)}\nMi usuario/enlace: `;
 }
 
 receiptButton.addEventListener('click', () => {
