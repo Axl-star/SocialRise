@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="SocialRise: compra Likes y Seguidores para tus redes sociales." />
+    <title>SocialRise | Likes y Seguidores</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#inicio" aria-label="SocialRise inicio">
+          <span class="brand-mark">SR</span>
+          <span>SocialRise</span>
+        </a>
+        <nav class="main-nav" aria-label="Navegación principal">
+          <a class="nav-active" href="#inicio">Inicio</a>
+          <a href="#plataformas" data-i18n="navServices">Servicios</a>
+          <a href="#plataformas" data-i18n="navPrices">Precios</a>
+          <a href="#soporte" data-i18n="navContact">Contacto</a>
+        </nav>
+        <div class="topbar-actions">
+          <a class="login-button" href="#soporte">♙&nbsp; Iniciar sesión</a>
+          <button class="music-button" id="music-toggle" type="button" aria-label="Silenciar música" aria-pressed="true">
+            <span id="music-symbol">♫</span>
+            <span id="music-label">Mute</span>
+          </button>
+          <button class="language-button" id="language-toggle" type="button" aria-label="Cambiar idioma">EN</button>
+          <button class="cart-button" type="button" aria-label="Abrir carrito">
+            <span class="cart-symbol">🛒</span>
+            <span data-i18n="cart">Carrito</span>
+            <b id="cart-count">0</b>
+          </button>
+        </div>
+      </header>
+
+      <section class="intro" id="inicio">
+        <p class="eyebrow" data-i18n="eyebrow">Crecimiento social simple</p>
+        <h1 class="intro-title"><span data-i18n="heroTitle">Haz tu compra de</span><strong data-i18n="heroStrong">forma sencilla.</strong></h1>
+        <p class="intro-text" data-i18n="heroText">Selecciona una plataforma para comprar Likes, Seguidores o Vistas en pocos pasos.</p>
+        <div class="intro-highlights" aria-label="Beneficios">
+          <span><b>⚡</b><strong data-i18n="fast">Rápido</strong><small data-i18n="inMinutes">En minutos.</small></span>
+          <span><b>🛡</b><strong data-i18n="safe">Seguro</strong><small data-i18n="reliable">100% confiable.</small></span>
+          <span><b>★</b><strong data-i18n="easy">Fácil</strong><small data-i18n="simple">Sin complicaciones.</small></span>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <span class="hero-orb orb-instagram">◎</span>
+          <span class="hero-orb orb-tiktok">♪</span>
+          <span class="hero-orb orb-facebook">f</span>
+          <div class="hero-phone"><strong>↗</strong><b>SocialRise</b><small>Tu crecimiento,<br />nuestro objetivo.</small></div>
+        </div>
+      </section>
+
+      <section class="platforms" id="plataformas" aria-label="Selecciona una red social">
+        <p class="eyebrow" data-i18n="choosePlatform">Selecciona una plataforma</p>
+        <h2><span data-i18n="whichPlatform">¿Qué plataforma quieres</span> <span data-i18n="grow">hacer crecer?</span></h2>
+      </section>
+      <section class="network-grid" aria-label="Plataformas disponibles">
+        <button class="network-button instagram" data-network="Instagram">
+          <span class="network-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><defs><linearGradient id="instagram-gradient" x1="2" y1="22" x2="22" y2="2"><stop stop-color="#ffd600"/><stop offset=".35" stop-color="#ff7a00"/><stop offset=".68" stop-color="#ff0069"/><stop offset="1" stop-color="#d300c5"/></linearGradient></defs><path fill="url(#instagram-gradient)" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.245-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
+          </span>
+          <strong>Instagram</strong>
+          <small>Likes | Seguidores | Vistas</small>
+          <em data-i18n="buy">🛒 Comprar</em>
+        </button>
+        <button class="network-button tiktok" data-network="TikTok">
+          <span class="network-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path fill="#25f4ee" opacity=".9" transform="translate(-.8 .5)" d="M15.7 3h3.1c.4 1.6 1.3 2.5 3.2 2.8v3.1c-1.3-.1-2.4-.5-3.4-1.2v7.1c0 3.2-2.5 5.7-5.7 5.7-3.1 0-5.7-2.5-5.7-5.7s2.6-5.7 5.7-5.7c.4 0 .8 0 1.2.1v3.2c-.4-.2-.8-.3-1.2-.3-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.8-1.2 2.8-2.7V3Z"/><path fill="#fe2c55" opacity=".9" transform="translate(.8 .5)" d="M15.7 3h3.1c.4 1.6 1.3 2.5 3.2 2.8v3.1c-1.3-.1-2.4-.5-3.4-1.2v7.1c0 3.2-2.5 5.7-5.7 5.7-3.1 0-5.7-2.5-5.7-5.7s2.6-5.7 5.7-5.7c.4 0 .8 0 1.2.1v3.2c-.4-.2-.8-.3-1.2-.3-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.8-1.2 2.8-2.7V3Z"/><path fill="#050505" d="M15.7 3h3.1c.4 1.6 1.3 2.5 3.2 2.8v3.1c-1.3-.1-2.4-.5-3.4-1.2v7.1c0 3.2-2.5 5.7-5.7 5.7-3.1 0-5.7-2.5-5.7-5.7s2.6-5.7 5.7-5.7c.4 0 .8 0 1.2.1v3.2c-.4-.2-.8-.3-1.2-.3-1.5 0-2.7 1.2-2.7 2.7s1.2 2.7 2.7 2.7 2.8-1.2 2.8-2.7V3Z"/></svg>
+          </span>
+          <strong>TikTok</strong>
+          <small>Likes | Seguidores | Vistas</small>
+          <em data-i18n="buy">🛒 Comprar</em>
+        </button>
+        <button class="network-button facebook" data-network="Facebook">
+          <span class="network-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path fill="#1877f2" d="M13.5 22v-8h2.8l.4-3.2h-3.2V7.2c0-.9.3-1.6 1.7-1.6H17V2.5c-.3 0-1.2-.1-2.4-.1-2.3 0-4 1.4-4 4.1v4.3H8v3.2h2.6v8h2.9Z"/></svg>
+          </span>
+          <strong>Facebook</strong>
+          <small>Likes | Seguidores | Vistas</small>
+          <em data-i18n="buy">🛒 Comprar</em>
+        </button>
+        <button class="network-button youtube" data-network="YouTube">
+          <span class="network-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path fill="#ff0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+          </span>
+          <strong>YouTube</strong>
+          <small>Likes | Suscriptores | Vistas</small>
+          <em data-i18n="buy">🛒 Comprar</em>
+        </button>
+      </section>
+
+      <a class="support-button" id="soporte" href="https://wa.me/14323419865?text=Hola%20SocialRise%2C%20necesito%20soporte." target="_blank" rel="noopener" aria-label="Contactar soporte por WhatsApp">
+        <svg class="whatsapp-logo" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16 3.5A12.4 12.4 0 0 0 5.3 22.2L3.7 28.3l6.3-1.6A12.5 12.5 0 1 0 16 3.5Zm0 22.6c-2 0-4-.5-5.7-1.6l-.4-.2-3.7.9 1-3.6-.3-.4a10.1 10.1 0 1 1 9.1 4.9Zm5.5-7.5c-.3-.2-1.7-.9-2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.2 8.2 0 0 1-2.4-1.5 9.2 9.2 0 0 1-1.7-2.1c-.2-.4 0-.6.2-.8l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.5 0-.7l-.9-2.1c-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1-1.1 2.5s1.1 2.9 1.3 3.1c.2.2 2.2 3.4 5.3 4.7.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 1.9-1.3.2-.6.2-1.2.1-1.3-.1-.2-.3-.3-.6-.5Z"/>
+        </svg>
+        <small data-i18n="supportLine">Compra segura · Atención por WhatsApp</small>
+        <em data-i18n="contact">◔ Contactar</em>
+      </a>
+
+      <section class="shop-panel" id="shop" aria-live="polite" aria-label="Comprar en la red seleccionada"></section>
+
+      <section class="cart-panel" id="cart-panel" aria-label="Carrito de compras">
+        <div class="cart-panel-heading">
+          <div>
+            <p class="eyebrow" data-i18n="yourOrder">Tu pedido</p>
+            <h2 data-i18n="cart">Carrito</h2>
+          </div>
+          <button class="cart-close" type="button" aria-label="Cerrar carrito">×</button>
+        </div>
+        <div id="cart-items">
+          <p class="cart-empty">Tu carrito está vacío.</p>
+        </div>
+        <div class="cart-total">
+          <strong data-i18n="total">Total</strong>
+          <strong id="cart-total">$0 USD</strong>
+        </div>
+        <button class="checkout" id="cart-checkout" type="button" data-i18n="checkout">Continuar con Cash App</button>
+        <div class="payment-panel" id="payment-panel" aria-label="Pago con Cash App" aria-hidden="true">
+          <p class="eyebrow" data-i18n="paymentMethod">Método de pago</p>
+          <h2 data-i18n="payCashApp">Paga con Cash App</h2>
+          <p class="payment-copy" data-i18n="paymentCopy">Envía el total de tu pedido a este identificador de Cash App:</p>
+          <code class="cashapp-tag">$SocialRise</code>
+          <p class="payment-link"><a id="cashapp-link" href="https://cash.app/$SocialRise" target="_blank" rel="noopener">cash.app/$SocialRise</a></p>
+          <div class="payment-total"><span>Total a enviar</span><strong id="payment-total">$0 USD</strong></div>
+          <a class="cashapp-button" id="cashapp-open" href="https://cash.app/$SocialRise" target="_blank" rel="noopener" data-i18n="openCashApp">Abrir Cash App</a>
+          <button class="receipt-button" id="receipt-button" type="button" data-i18n="sendReceipt">Enviar comprobante por WhatsApp</button>
+          <small class="payment-note" data-i18n="paymentNote">Después del pago, envía el comprobante para validar y procesar tu pedido.</small>
+        </div>
+      </section>
+
+      <section class="benefits" aria-label="Ventajas de SocialRise">
+        <span><b>🚀</b><strong>Entrega rápida</strong><small>En minutos.</small></span>
+        <span><b>🛡</b><strong>100% seguro</strong><small>Tus datos protegidos.</small></span>
+        <span><b>🎧</b><strong>Atención 24/7</strong><small>Por WhatsApp.</small></span>
+        <span><b>★</b><strong>Clientes felices</strong><small>Miles ya confían.</small></span>
+      </section>
+      <footer class="footer-note"><strong>♛ SocialRise</strong><small>Más visibilidad. Más oportunidades.</small></footer>
+    </main>
+    <audio id="background-music" loop preload="auto" autoplay muted playsinline>
+      <source src="https://archive.org/download/Electronic_1224-21753/Podington_Bear_-_Automatic.mp3" type="audio/mpeg" />
+    </audio>
+    <script src="script.js?v=cart-shop"></script>
+  </body>
+</html>
