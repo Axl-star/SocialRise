@@ -20,12 +20,31 @@ const paymentCopy = document.querySelector('#payment-copy');
 const binanceQr = document.querySelector('#binance-qr');
 const paypalQr = document.querySelector('#paypal-qr');
 const paymentMethodButtons = document.querySelectorAll('.payment-method');
+const walletPaymentMethod = document.querySelector('#wallet-payment-method');
+const walletPayButton = document.querySelector('#wallet-pay-button');
 const receiptButton = document.querySelector('#receipt-button');
 const musicToggle = document.querySelector('#music-toggle');
 const musicLabel = document.querySelector('#music-label');
 const musicSymbol = document.querySelector('#music-symbol');
 const backgroundMusic = document.querySelector('#background-music');
 const languageToggle = document.querySelector('#language-toggle');
+const accountButton = document.querySelector('#account-button');
+const authModal = document.querySelector('#auth-modal');
+const walletModal = document.querySelector('#wallet-modal');
+const adminModal = document.querySelector('#admin-modal');
+const loginForm = document.querySelector('#login-form');
+const registerForm = document.querySelector('#register-form');
+const authMessage = document.querySelector('#auth-message');
+const walletWelcome = document.querySelector('#wallet-welcome');
+const walletBalance = document.querySelector('#wallet-balance');
+const depositForm = document.querySelector('#deposit-form');
+const walletMessage = document.querySelector('#wallet-message');
+const walletHistoryList = document.querySelector('#wallet-history-list');
+const logoutButton = document.querySelector('#logout-button');
+const adminOpen = document.querySelector('#admin-open');
+const adminUsers = document.querySelector('#admin-users');
+const adminDeposits = document.querySelector('#admin-deposits');
+const adminMessage = document.querySelector('#admin-message');
 const baseUnits = 10000;
 const basePrice = 90;
 const likesBasePrice = 55;
@@ -36,6 +55,7 @@ let selectedNetwork = '';
 let selectedType = 'Seguidores';
 let selectedPaymentMethod = 'cashapp';
 let cartToastTimeout;
+let currentUser = null;
 const cart = [];
 const musicPreferenceKey = 'socialrise-music-enabled';
 const languageKey = 'socialrise-language';
@@ -59,7 +79,7 @@ const translations = {
     choosePayment: 'Elige cómo pagar', payBinance: 'Paga con Binance BNB', payPayPal: 'Paga con PayPal',
     binanceCopy: 'Escanea este código QR desde Binance Pay y envía el total en BNB.',
     paypalCopy: 'Escanea este código QR con la cámara o la app de PayPal para enviar el total.',
-    scanQr: 'Escanea el código QR',
+    scanQr: 'Escanea el código QR', payWallet: 'Paga con tu wallet', walletCopy: 'Usa tu saldo disponible para pagar este pedido.',
     chooseService: 'Selecciona un servicio', followers: 'Seguidores', likes: 'Likes', views: 'Vistas',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
     quantity: '¿Cuántos quieres?', baseRate: '10.000 por $90 · $0,90 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $45 · $0,45 por cada 100', discount: 'Descuento automático',
@@ -84,7 +104,7 @@ const translations = {
     choosePayment: 'Choose how to pay', payBinance: 'Pay with Binance BNB', payPayPal: 'Pay with PayPal',
     binanceCopy: 'Scan this QR code in Binance Pay and send the total in BNB.',
     paypalCopy: 'Scan this QR code with your camera or the PayPal app to send the total.',
-    scanQr: 'Scan the QR code',
+    scanQr: 'Scan the QR code', payWallet: 'Pay with your wallet', walletCopy: 'Use your available balance to pay for this order.',
     chooseService: 'Choose a service', followers: 'Followers', likes: 'Likes', views: 'Views',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
     quantity: 'How many do you want?', baseRate: '10,000 for $90 · $0.90 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $45 · $0.45 per 100', discount: 'Automatic discount',
@@ -180,13 +200,14 @@ function getPrice(amount, type) {
 }
 
 function paymentMethodName(method = selectedPaymentMethod) {
-  return method === 'binance' ? 'Binance BNB' : method === 'paypal' ? 'PayPal' : 'Cash App';
+  return method === 'binance' ? 'Binance BNB' : method === 'paypal' ? 'PayPal' : method === 'wallet' ? 'Wallet' : 'Cash App';
 }
 
 function updatePaymentMethod(method) {
   selectedPaymentMethod = method;
   const isCashApp = method === 'cashapp';
   const isBinance = method === 'binance';
+  const isWallet = method === 'wallet';
 
   paymentMethodButtons.forEach((button) => {
     const isSelected = button.dataset.paymentMethod === method;
@@ -194,13 +215,14 @@ function updatePaymentMethod(method) {
     button.setAttribute('aria-pressed', String(isSelected));
   });
 
-  paymentTitle.textContent = isCashApp ? t('payCashApp') : isBinance ? t('payBinance') : t('payPayPal');
-  paymentCopy.textContent = isCashApp ? t('paymentCopy') : isBinance ? t('binanceCopy') : t('paypalCopy');
+  paymentTitle.textContent = isCashApp ? t('payCashApp') : isBinance ? t('payBinance') : isWallet ? t('payWallet') : t('payPayPal');
+  paymentCopy.textContent = isCashApp ? t('paymentCopy') : isBinance ? t('binanceCopy') : isWallet ? t('walletCopy') : t('paypalCopy');
   cashAppTag.hidden = !isCashApp;
   cashAppLinkWrap.hidden = !isCashApp;
   cashAppOpen.hidden = !isCashApp;
   binanceQr.hidden = !isBinance;
   paypalQr.hidden = method !== 'paypal';
+  walletPayButton.hidden = !isWallet;
 }
 
 function renderShop() {
@@ -366,6 +388,24 @@ paymentMethodButtons.forEach((button) => {
   button.addEventListener('click', () => updatePaymentMethod(button.dataset.paymentMethod));
 });
 
+walletPayButton.addEventListener('click', async () => {
+  if (!currentUser) return openModal(authModal);
+  walletPayButton.disabled = true;
+  try {
+    const result = await api('/api/wallet/pay', { method: 'POST', body: { items: cart.map(({ network, type, amount }) => ({ network, type, amount })) } });
+    cart.splice(0, cart.length);
+    renderCart();
+    paymentPanel.classList.remove('is-open');
+    paymentPanel.setAttribute('aria-hidden', 'true');
+    showCartToast(result.message);
+    await refreshSession();
+  } catch (error) {
+    showCartToast(error.message);
+  } finally {
+    walletPayButton.disabled = false;
+  }
+});
+
 function orderMessage() {
   const summary = cart.map((item) => `${item.network}: ${item.amount.toLocaleString('en-US')} ${item.type} - ${money(item.price)}`).join('\n');
   const total = cart.reduce((sum, item) => sum + item.price, 0);
@@ -376,6 +416,164 @@ receiptButton.addEventListener('click', () => {
   if (!cart.length) return;
   const message = orderMessage();
   window.open(`https://wa.me/14323419865?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+});
+
+async function api(path, options = {}) {
+  const response = await fetch(path, {
+    method: options.method || 'GET',
+    headers: options.body ? { 'Content-Type': 'application/json' } : {},
+    body: options.body ? JSON.stringify(options.body) : undefined,
+    credentials: 'same-origin',
+  });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || 'No fue posible completar la solicitud.');
+  return payload;
+}
+
+function openModal(modal) {
+  modal.classList.add('is-open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeModal(modal) {
+  modal.classList.remove('is-open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function formatCents(value) {
+  return money(Number(value || 0) / 100);
+}
+
+function updateAccountUI() {
+  accountButton.textContent = currentUser ? currentUser.username : 'Cuenta';
+  adminOpen.hidden = !currentUser || currentUser.role !== 'admin';
+  walletPaymentMethod.hidden = !currentUser;
+  if (!currentUser && selectedPaymentMethod === 'wallet') updatePaymentMethod('cashapp');
+  if (currentUser) {
+    walletWelcome.textContent = `Hola, ${currentUser.username}`;
+    walletBalance.textContent = formatCents(currentUser.balanceCents);
+  }
+}
+
+async function loadWallet() {
+  if (!currentUser) return;
+  const wallet = await api('/api/wallet');
+  currentUser.balanceCents = wallet.balanceCents;
+  updateAccountUI();
+  const deposits = wallet.deposits.map((deposit) => `
+    <div class="history-item"><div><strong>Depósito ${formatCents(deposit.amount_cents)}</strong><small>${deposit.note || 'Sin referencia'} · ${deposit.created_at}</small></div><b class="status-${deposit.status}">${deposit.status}</b></div>
+  `);
+  const orders = wallet.orders.map((order) => `
+    <div class="history-item"><div><strong>Compra ${formatCents(order.amount_cents)}</strong><small>${order.payment_method} · ${order.created_at}</small></div><b class="status-credited">pagado</b></div>
+  `);
+  walletHistoryList.innerHTML = [...deposits, ...orders].join('') || '<p class="cart-empty">Aún no hay movimientos.</p>';
+}
+
+async function refreshSession() {
+  try {
+    const { user } = await api('/api/auth/me');
+    currentUser = user;
+    updateAccountUI();
+  } catch {
+    currentUser = null;
+    updateAccountUI();
+  }
+}
+
+async function loadAdmin() {
+  const data = await api('/api/admin/users');
+  adminDeposits.innerHTML = data.deposits.filter((deposit) => deposit.status === 'pending').map((deposit) => `
+    <div class="admin-row"><div><strong>${deposit.username} · ${formatCents(deposit.amount_cents)}</strong><small>${deposit.email} · ${deposit.note || 'Sin referencia'}</small></div><button class="credit-button" data-deposit-id="${deposit.id}" type="button">Acreditar</button></div>
+  `).join('') || '<p class="cart-empty">No hay solicitudes pendientes.</p>';
+  adminUsers.innerHTML = data.users.map((user) => `
+    <div class="admin-row"><div><strong>${user.username}${user.role === 'admin' ? ' · Admin' : ''}</strong><small>${user.email} · ${user.created_at}</small></div><b>${formatCents(user.balance_cents)}</b></div>
+  `).join('');
+  adminDeposits.querySelectorAll('.credit-button').forEach((button) => {
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      try {
+        const result = await api(`/api/admin/deposits/${button.dataset.depositId}/credit`, { method: 'POST' });
+        adminMessage.textContent = result.message;
+        await loadAdmin();
+      } catch (error) {
+        adminMessage.textContent = error.message;
+        button.disabled = false;
+      }
+    });
+  });
+}
+
+document.querySelectorAll('[data-close-modal]').forEach((button) => {
+  button.addEventListener('click', () => closeModal(document.querySelector(`#${button.dataset.closeModal}`)));
+});
+
+document.querySelectorAll('.auth-tab').forEach((button) => {
+  button.addEventListener('click', () => {
+    const register = button.dataset.authMode === 'register';
+    document.querySelectorAll('.auth-tab').forEach((tab) => tab.classList.toggle('active', tab === button));
+    loginForm.hidden = register;
+    registerForm.hidden = !register;
+    authMessage.textContent = '';
+  });
+});
+
+accountButton.addEventListener('click', async () => {
+  if (!currentUser) return openModal(authModal);
+  openModal(walletModal);
+  try { await loadWallet(); } catch (error) { walletMessage.textContent = error.message; }
+});
+
+loginForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = new FormData(loginForm);
+  authMessage.textContent = '';
+  try {
+    const { user } = await api('/api/auth/login', { method: 'POST', body: Object.fromEntries(form) });
+    currentUser = user;
+    updateAccountUI();
+    closeModal(authModal);
+    openModal(walletModal);
+    await loadWallet();
+  } catch (error) { authMessage.textContent = error.message; }
+});
+
+registerForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = new FormData(registerForm);
+  authMessage.textContent = '';
+  try {
+    const { user } = await api('/api/auth/register', { method: 'POST', body: Object.fromEntries(form) });
+    currentUser = user;
+    updateAccountUI();
+    closeModal(authModal);
+    openModal(walletModal);
+    await loadWallet();
+  } catch (error) { authMessage.textContent = error.message; }
+});
+
+depositForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const form = new FormData(depositForm);
+  walletMessage.textContent = '';
+  try {
+    const result = await api('/api/wallet/deposits', { method: 'POST', body: Object.fromEntries(form) });
+    walletMessage.textContent = result.message;
+    depositForm.reset();
+    await loadWallet();
+  } catch (error) { walletMessage.textContent = error.message; }
+});
+
+logoutButton.addEventListener('click', async () => {
+  await api('/api/auth/logout', { method: 'POST' });
+  currentUser = null;
+  updateAccountUI();
+  closeModal(walletModal);
+});
+
+adminOpen.addEventListener('click', async () => {
+  openModal(adminModal);
+  adminMessage.textContent = '';
+  try { await loadAdmin(); } catch (error) { adminMessage.textContent = error.message; }
 });
 
 renderCart();
@@ -408,3 +606,4 @@ languageToggle.addEventListener('click', (event) => {
 });
 
 applyTranslations();
+refreshSession();

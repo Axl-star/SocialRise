@@ -24,6 +24,7 @@
           <a href="#soporte" data-i18n="navContact">Contacto</a>
         </nav>
         <div class="topbar-actions">
+          <button class="account-button" id="account-button" type="button">Cuenta</button>
           <button class="music-button" id="music-toggle" type="button" aria-label="Silenciar música" aria-pressed="true">
             <span id="music-symbol">♫</span>
             <span id="music-label">Mute</span>
@@ -126,6 +127,7 @@
             <button class="payment-method active" type="button" data-payment-method="cashapp">Cash App</button>
             <button class="payment-method" type="button" data-payment-method="binance">Binance BNB</button>
             <button class="payment-method" type="button" data-payment-method="paypal">PayPal</button>
+            <button class="payment-method" id="wallet-payment-method" type="button" data-payment-method="wallet" hidden>Wallet</button>
           </div>
           <div class="payment-instructions">
             <h3 id="payment-title">Paga con Cash App</h3>
@@ -137,6 +139,7 @@
           </div>
           <div class="payment-total"><span>Total a enviar</span><strong id="payment-total">$0 USD</strong></div>
           <a class="cashapp-button" id="cashapp-open" href="https://cash.app/$SocialRise" target="_blank" rel="noopener" data-i18n="openCashApp">Abrir Cash App</a>
+          <button class="cashapp-button" id="wallet-pay-button" type="button" hidden>Pagar con saldo wallet</button>
           <button class="receipt-button" id="receipt-button" type="button" data-i18n="sendReceipt">Enviar comprobante por WhatsApp</button>
           <small class="payment-note" data-i18n="paymentNote">Después del pago, envía el comprobante para validar y procesar tu pedido.</small>
         </div>
@@ -150,6 +153,54 @@
       </section>
       <footer class="footer-note"><strong>♛ SocialRise</strong><small>Más visibilidad. Más oportunidades.</small></footer>
     </main>
+    <section class="account-modal" id="auth-modal" aria-hidden="true" aria-label="Acceso a cuenta">
+      <div class="account-card">
+        <button class="modal-close" type="button" data-close-modal="auth-modal" aria-label="Cerrar">×</button>
+        <p class="eyebrow">SOCIALRISE</p><h2>Tu cuenta</h2>
+        <div class="auth-tabs">
+          <button class="auth-tab active" type="button" data-auth-mode="login">Iniciar sesión</button>
+          <button class="auth-tab" type="button" data-auth-mode="register">Registrarme</button>
+        </div>
+        <form class="auth-form" id="login-form">
+          <label>Usuario o correo<input name="identifier" autocomplete="username" required /></label>
+          <label>Contraseña<input name="password" type="password" autocomplete="current-password" required /></label>
+          <button class="primary-action" type="submit">Entrar</button>
+        </form>
+        <form class="auth-form" id="register-form" hidden>
+          <label>Usuario<input name="username" minlength="3" maxlength="24" autocomplete="username" required /></label>
+          <label>Correo electrónico<input name="email" type="email" autocomplete="email" required /></label>
+          <label>Contraseña<input name="password" type="password" minlength="8" autocomplete="new-password" required /></label>
+          <button class="primary-action" type="submit">Crear cuenta</button>
+        </form>
+        <p class="form-message" id="auth-message" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+    <section class="account-modal" id="wallet-modal" aria-hidden="true" aria-label="Wallet">
+      <div class="account-card wallet-card">
+        <button class="modal-close" type="button" data-close-modal="wallet-modal" aria-label="Cerrar">×</button>
+        <p class="eyebrow">MI CUENTA</p><h2 id="wallet-welcome">Mi wallet</h2>
+        <div class="wallet-balance"><span>Saldo disponible</span><strong id="wallet-balance">$0.00 USD</strong></div>
+        <form class="deposit-form" id="deposit-form">
+          <h3>Solicitar depósito</h3>
+          <label>Monto en USD<input name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" required /></label>
+          <label>Nota o referencia (opcional)<input name="note" maxlength="240" /></label>
+          <button class="primary-action" type="submit">Enviar solicitud</button>
+        </form>
+        <p class="form-message" id="wallet-message" role="status" aria-live="polite"></p>
+        <div class="wallet-history"><h3>Movimientos</h3><div id="wallet-history-list"></div></div>
+        <button class="admin-open" id="admin-open" type="button" hidden>Panel de administración</button>
+        <button class="logout-button" id="logout-button" type="button">Cerrar sesión</button>
+      </div>
+    </section>
+    <section class="account-modal" id="admin-modal" aria-hidden="true" aria-label="Panel de administración">
+      <div class="account-card admin-card">
+        <button class="modal-close" type="button" data-close-modal="admin-modal" aria-label="Cerrar">×</button>
+        <p class="eyebrow">ADMINISTRACIÓN</p><h2>Usuarios y depósitos</h2>
+        <div class="admin-section"><h3>Solicitudes pendientes</h3><div id="admin-deposits"></div></div>
+        <div class="admin-section"><h3>Usuarios</h3><div id="admin-users"></div></div>
+        <p class="form-message" id="admin-message" role="status" aria-live="polite"></p>
+      </div>
+    </section>
     <div class="cart-toast" id="cart-toast" role="status" aria-live="polite" aria-atomic="true">
       <span aria-hidden="true">✓</span><span id="cart-toast-message"></span>
     </div>
