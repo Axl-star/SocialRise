@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Descarga el video 4K desde la red local." />
+    <title>Descargar video 4K | SocialRise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root { color-scheme: dark; --pink: #ff3bc7; --cyan: #36e5ff; }
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh; margin: 0; padding: 24px;
+        display: grid; place-items: center; overflow-x: hidden;
+        color: #fff; font-family: Inter, system-ui, sans-serif;
+        background: radial-gradient(circle at 10% 10%, #4b0d67 0, transparent 35%),
+          radial-gradient(circle at 90% 90%, #073d62 0, transparent 38%),
+          linear-gradient(135deg, #080018, #12052d 55%, #031727);
+      }
+      .card { width: min(780px, 100%); padding: clamp(20px, 5vw, 42px); border: 1px solid #ffffff2b;
+        border-radius: 28px; background: #10082dd9; box-shadow: 0 30px 90px #0008, inset 0 1px #ffffff1c; backdrop-filter: blur(20px); }
+      .brand { display: inline-flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 800; }
+      .brand img { width: 38px; height: 38px; border-radius: 12px; object-fit: cover; }
+      .eyebrow { margin: 38px 0 10px; color: var(--cyan); font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+      h1 { max-width: 620px; margin: 0; font-size: clamp(2rem, 6vw, 4rem); line-height: .98; letter-spacing: -.06em; }
+      h1 strong { color: var(--pink); }
+      .intro { color: #ffffffbf; line-height: 1.6; }
+      video { width: 100%; margin: 22px 0; display: block; border: 1px solid #ffffff2b; border-radius: 18px; background: #000; box-shadow: 0 18px 45px #0008; }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+      .button { min-height: 48px; padding: 13px 18px; border: 0; border-radius: 14px; color: #fff; font: inherit; font-weight: 800; text-decoration: none; cursor: pointer; transition: transform .2s, filter .2s; }
+      .button:hover { filter: brightness(1.12); transform: translateY(-2px); }
+      .download { background: linear-gradient(135deg, var(--pink), #ff7a55); box-shadow: 0 10px 25px #ff3bc755; }
+      .back { border: 1px solid #ffffff38; background: #ffffff12; }
+      .meta { margin-top: 20px; color: #ffffff91; font-size: .85rem; }
+      @media (max-width: 520px) { body { padding: 12px; } .card { border-radius: 22px; } }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <a class="brand" href="/"><img src="/assets/socialrise-logo.jpeg" alt="" />SocialRise</a>
+      <p class="eyebrow">Descarga en red local</p>
+      <h1>Tu video <strong>4K</strong>, listo para descargar.</h1>
+      <p class="intro">Reproduce una vista previa o descarga el archivo directamente en tu teléfono, computadora o tablet conectada a la misma red Wi-Fi.</p>
+      <video controls preload="metadata" src="/media/socialrise-video.mp4"></video>
+      <div class="actions">
+        <a class="button download" href="/download/socialrise-video.mp4">⬇ Descargar video 4K</a>
+        <a class="button back" href="/">Volver a SocialRise</a>
+      </div>
+      <p class="meta">Archivo MP4 · Servido desde este equipo en la red local</p>
+    </main>
+  </body>
+</html>

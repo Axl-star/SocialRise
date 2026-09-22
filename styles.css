@@ -635,6 +635,32 @@ h1 {
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.12);
 }
+.quantity-price-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+.quantity-field label { margin-bottom: 7px; }
+.inline-price {
+  min-width: 102px;
+  padding: 9px 11px;
+  border: 1px solid rgba(119, 242, 160, 0.36);
+  border-radius: 10px;
+  background: rgba(119, 242, 160, 0.1);
+  text-align: right;
+}
+.inline-price span {
+  display: block;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.65rem;
+}
+.inline-price strong {
+  display: block;
+  margin-top: 2px;
+  color: #77f2a0;
+  font-size: 1.05rem;
+}
 .custom-order label {
   display: block;
   margin-bottom: 7px;
@@ -1156,6 +1182,9 @@ body {
   .network-button small,
   .support-button small { line-height: 1.25; }
   .benefits { gap: 12px 8px; }
+  .quantity-price-row { grid-template-columns: 1fr 96px; gap: 8px; }
+  .inline-price { min-width: 0; padding-inline: 8px; }
+  .quantity-control input { padding-right: 68px; }
 }
 
 /* Premium visual polish */
