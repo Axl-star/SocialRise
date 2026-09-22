@@ -27,9 +27,10 @@ const musicSymbol = document.querySelector('#music-symbol');
 const backgroundMusic = document.querySelector('#background-music');
 const languageToggle = document.querySelector('#language-toggle');
 const baseUnits = 10000;
-const basePrice = 90;
+const minimumPurchase = 5;
+const basePrice = 120;
 const likesBasePrice = 55;
-const orderDiscountThreshold = 90;
+const orderDiscountThreshold = 120;
 const orderDiscountPercentage = 30;
 const viewsPriceMultiplier = 0.5;
 let selectedNetwork = '';
@@ -68,11 +69,11 @@ const translations = {
     targetUsernameInvalid: 'Escribe un usuario válido de la red social.',
     targetVideoInvalid: 'Escribe un enlace válido que empiece por http:// o https://.',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
-    quantity: '¿Cuántos quieres?', baseRate: '10.000 por $90 · $0,90 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $45 · $0,45 por cada 100', discount: 'Descuento automático',
+    quantity: 'Presupuesto para este servicio', estimatedQuantity: 'Cantidad estimada', realFollowers: 'Seguidores reales · 0 caídas', baseRate: '10.000 por $120 · $1,20 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $60 · $0,60 por cada 100', discount: 'Descuento automático',
     discountFrom: 'desde', serviceAdded: 'Servicio añadido al carrito',
     emptyCart: 'Tu carrito está vacío.', addPackage: 'Agrega al menos un paquete al carrito.', cartAdded: 'Se añadió al carrito:',
     priceFor: 'Precio para tu pedido', regularPrice: 'Precio regular', youSave: 'Ahorras',
-    discountTiers: '30% en pedidos superiores a $90', minimumQuantity: 'Mínimo 100', units: 'unidades'
+    discountTiers: '30% en pedidos superiores a $120', minimumQuantity: 'Compra mínima $5', units: 'USD'
   },
   en: {
     navServices: 'Services', navPrices: 'Pricing', navContact: 'Contact', cart: 'Cart',
@@ -99,11 +100,11 @@ const translations = {
     targetUsernameInvalid: 'Enter a valid social media username.',
     targetVideoInvalid: 'Enter a valid link starting with http:// or https://.',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
-    quantity: 'How many do you want?', baseRate: '10,000 for $90 · $0.90 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $45 · $0.45 per 100', discount: 'Automatic discount',
+    quantity: 'Budget for this service', estimatedQuantity: 'Estimated quantity', realFollowers: 'Real followers · 0 drops', baseRate: '10,000 for $120 · $1.20 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $60 · $0.60 per 100', discount: 'Automatic discount',
     discountFrom: 'from', serviceAdded: 'Service added to cart',
     emptyCart: 'Your cart is empty.', addPackage: 'Add at least one package to the cart.', cartAdded: 'Added to cart:',
     priceFor: 'Your order price', regularPrice: 'Regular price', youSave: 'You save',
-    discountTiers: '30% on orders above $90', minimumQuantity: 'Minimum 100', units: 'units'
+    discountTiers: '30% on orders above $120', minimumQuantity: 'Minimum purchase $5', units: 'USD'
   }
 };
 
@@ -181,6 +182,14 @@ function getRegularPrice(amount, type) {
   return (amount / baseUnits) * unitPrice;
 }
 
+function getUnitPrice(type) {
+  return type === 'Likes' ? likesBasePrice : type === 'Vistas' ? basePrice * viewsPriceMultiplier : basePrice;
+}
+
+function getAmountForBudget(budget, type) {
+  return Math.max(100, Math.round((budget / getUnitPrice(type)) * baseUnits));
+}
+
 function getDiscountPercentage(amount, type) {
   return getRegularPrice(amount, type) > orderDiscountThreshold ? orderDiscountPercentage : 0;
 }
@@ -252,19 +261,24 @@ function renderShop() {
     <div class="custom-order">
       <label for="service-quantity">${t('quantity')} (${typeLabel(selectedType)})</label>
       <div class="quantity-control">
-        <input id="service-quantity" type="number" min="100" step="100" value="10000" inputmode="numeric" aria-describedby="quantity-help" />
+        <input id="service-quantity" type="number" min="${minimumPurchase}" step="0.01" value="${minimumPurchase.toFixed(2)}" inputmode="decimal" aria-describedby="quantity-help" />
         <span>${t('units')}</span>
       </div>
       <small id="quantity-help" class="quantity-help">${t('minimumQuantity')} · ${getRateDescription(selectedType)}</small>
+      ${selectedType === 'Seguidores' ? `<div class="real-followers-badge">${t('realFollowers')}</div>` : ''}
       <label for="service-target">${targetField(selectedType).label}</label>
       <input id="service-target" type="${selectedType === 'Seguidores' ? 'text' : 'url'}" placeholder="${targetField(selectedType).placeholder}" autocomplete="off" required />
       <small id="target-help" class="quantity-help">${targetField(selectedType).help}</small>
       <div class="price-summary">
         <span>${t('priceFor')}</span>
-        <strong id="calculated-price">${money(getPrice(baseUnits, selectedType))}</strong>
+        <strong id="calculated-price">${money(getPrice(getAmountForBudget(minimumPurchase, selectedType), selectedType))}</strong>
+      </div>
+      <div class="quantity-result">
+        <span>${t('estimatedQuantity')}</span>
+        <strong id="estimated-quantity">${getAmountForBudget(minimumPurchase, selectedType).toLocaleString('en-US')} ${typeLabel(selectedType)}</strong>
       </div>
       <div class="price-details">
-        <span>${t('regularPrice')} <b id="regular-price">${money(getRegularPrice(baseUnits, selectedType))}</b></span>
+        <span>${t('regularPrice')} <b id="regular-price">${money(getRegularPrice(getAmountForBudget(minimumPurchase, selectedType), selectedType))}</b></span>
         <span id="saving-line" hidden>${t('youSave')} <b id="saving-price">$0.00 USD</b></span>
       </div>
       <small class="discount-note" id="discount-note">${t('discount')}: 0% · ${t('discountTiers')}</small>
@@ -292,16 +306,20 @@ function renderShop() {
   const quantityInput = shopPanel.querySelector('#service-quantity');
   const targetInput = shopPanel.querySelector('#service-target');
   const calculatedPrice = shopPanel.querySelector('#calculated-price');
+  const estimatedQuantity = shopPanel.querySelector('#estimated-quantity');
   const regularPrice = shopPanel.querySelector('#regular-price');
   const savingLine = shopPanel.querySelector('#saving-line');
   const savingPrice = shopPanel.querySelector('#saving-price');
   const discountNote = shopPanel.querySelector('#discount-note');
   const updatePrice = () => {
-    const amount = Math.max(0, Number(quantityInput.value) || 0);
+    const budget = Math.max(minimumPurchase, Number(quantityInput.value) || minimumPurchase);
+    quantityInput.value = budget.toFixed(2);
+    const amount = getAmountForBudget(budget, selectedType);
     const discount = getDiscountPercentage(amount, selectedType);
     const standard = getRegularPrice(amount, selectedType);
     const price = getPrice(amount, selectedType);
     calculatedPrice.textContent = money(price);
+    estimatedQuantity.textContent = `${amount.toLocaleString('en-US')} ${typeLabel(selectedType)}`;
     regularPrice.textContent = money(standard);
     savingPrice.textContent = money(standard - price);
     savingLine.hidden = discount === 0;
@@ -310,10 +328,12 @@ function renderShop() {
 
   quantityInput.addEventListener('input', updatePrice);
   shopPanel.querySelector('.add-custom-order').addEventListener('click', () => {
-    const amount = Math.floor(Number(quantityInput.value) || 0);
+    const budget = Math.max(minimumPurchase, Number(quantityInput.value) || minimumPurchase);
+    quantityInput.value = budget.toFixed(2);
+    const amount = getAmountForBudget(budget, selectedType);
     const target = targetInput.value.trim();
-    if (amount < 100) {
-      quantityInput.setCustomValidity('La cantidad mínima es 100.');
+    if (budget < minimumPurchase) {
+      quantityInput.setCustomValidity(`La compra mínima es de $${minimumPurchase}.`);
       quantityInput.reportValidity();
       return;
     }
