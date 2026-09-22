@@ -68,6 +68,7 @@ const translations = {
     targetRequired: 'Completa el usuario o enlace antes de continuar.',
     targetUsernameInvalid: 'Escribe un usuario válido de la red social.',
     targetVideoInvalid: 'Escribe un enlace válido que empiece por http:// o https://.',
+    budgetInvalid: 'Escribe un monto válido usando solo números.',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
     quantity: 'Presupuesto para este servicio', estimatedQuantity: 'Cantidad estimada', realFollowers: 'Seguidores reales · 0 caídas', baseRate: '10.000 por $120 · $1,20 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $60 · $0,60 por cada 100', discount: 'Descuento automático',
     discountFrom: 'desde', serviceAdded: 'Servicio añadido al carrito',
@@ -99,6 +100,7 @@ const translations = {
     targetRequired: 'Complete the username or link before continuing.',
     targetUsernameInvalid: 'Enter a valid social media username.',
     targetVideoInvalid: 'Enter a valid link starting with http:// or https://.',
+    budgetInvalid: 'Enter a valid amount using numbers only.',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
     quantity: 'Budget for this service', estimatedQuantity: 'Estimated quantity', realFollowers: 'Real followers · 0 drops', baseRate: '10,000 for $120 · $1.20 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $60 · $0.60 per 100', discount: 'Automatic discount',
     discountFrom: 'from', serviceAdded: 'Service added to cart',
@@ -261,7 +263,7 @@ function renderShop() {
     <div class="custom-order">
       <label for="service-quantity">${t('quantity')} (${typeLabel(selectedType)})</label>
       <div class="quantity-control">
-        <input id="service-quantity" type="number" min="${minimumPurchase}" step="0.01" value="${minimumPurchase.toFixed(2)}" inputmode="decimal" aria-describedby="quantity-help" />
+        <input id="service-quantity" type="text" value="${minimumPurchase.toFixed(2)}" inputmode="decimal" autocomplete="off" aria-describedby="quantity-help" />
         <span>${t('units')}</span>
       </div>
       <small id="quantity-help" class="quantity-help">${t('minimumQuantity')} · ${getRateDescription(selectedType)}</small>
@@ -311,9 +313,30 @@ function renderShop() {
   const savingLine = shopPanel.querySelector('#saving-line');
   const savingPrice = shopPanel.querySelector('#saving-price');
   const discountNote = shopPanel.querySelector('#discount-note');
-  const updatePrice = () => {
-    const budget = Math.max(minimumPurchase, Number(quantityInput.value) || minimumPurchase);
-    quantityInput.value = budget.toFixed(2);
+  const updatePrice = (normalize = false, inputValue = quantityInput.value) => {
+    const rawBudget = inputValue.trim();
+    if (!rawBudget) {
+      if (normalize) {
+        quantityInput.value = minimumPurchase.toFixed(2);
+        updatePrice();
+      } else {
+        calculatedPrice.textContent = money(0);
+        estimatedQuantity.textContent = '—';
+        regularPrice.textContent = money(0);
+        savingPrice.textContent = money(0);
+        savingLine.hidden = true;
+        discountNote.textContent = `${t('discount')}: 0% · ${t('discountTiers')}`;
+      }
+      return;
+    }
+    const parsedBudget = Number(rawBudget.replace(',', '.'));
+    if (!Number.isFinite(parsedBudget)) {
+      quantityInput.setCustomValidity(t('budgetInvalid'));
+      return;
+    }
+    quantityInput.setCustomValidity('');
+    const budget = parsedBudget < minimumPurchase ? minimumPurchase : parsedBudget;
+    if (normalize) quantityInput.value = budget.toFixed(2);
     const amount = getAmountForBudget(budget, selectedType);
     const discount = getDiscountPercentage(amount, selectedType);
     const standard = getRegularPrice(amount, selectedType);
@@ -326,9 +349,16 @@ function renderShop() {
     discountNote.textContent = `${t('discount')}: ${discount}% · ${t('discountTiers')}`;
   };
 
-  quantityInput.addEventListener('input', updatePrice);
+  quantityInput.addEventListener('input', (event) => updatePrice(false, event.currentTarget.value));
+  quantityInput.addEventListener('blur', (event) => updatePrice(true, event.currentTarget.value));
   shopPanel.querySelector('.add-custom-order').addEventListener('click', () => {
-    const budget = Math.max(minimumPurchase, Number(quantityInput.value) || minimumPurchase);
+    const parsedBudget = Number(quantityInput.value.trim().replace(',', '.'));
+    if (!Number.isFinite(parsedBudget)) {
+      quantityInput.setCustomValidity(t('budgetInvalid'));
+      quantityInput.reportValidity();
+      return;
+    }
+    const budget = Math.max(minimumPurchase, parsedBudget);
     quantityInput.value = budget.toFixed(2);
     const amount = getAmountForBudget(budget, selectedType);
     const target = targetInput.value.trim();

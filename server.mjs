@@ -151,16 +151,29 @@ function cents(value) {
 
 function calculateOrderCents(items) {
   if (!Array.isArray(items) || !items.length || items.length > 30) throw new Error('El pedido no es válido.');
-  const allowedTypes = { Seguidores: 9000, Likes: 5500, Vistas: 4500 };
+  const allowedTypes = { Seguidores: 12000, Likes: 5500, Vistas: 6000 };
   const allowedNetworks = new Set(['Instagram', 'TikTok', 'Facebook', 'YouTube']);
-  return items.reduce((total, item) => {
+  const total = items.reduce((sum, item) => {
     const amount = Number(item.amount);
-    if (!allowedNetworks.has(item.network) || !Number.isInteger(amount) || amount < 100 || amount > 10_000_000 || !allowedTypes[item.type]) {
+    const target = typeof item.target === 'string' ? item.target.trim() : '';
+    const validUsername = item.type === 'Seguidores' && /^@?[a-zA-Z0-9._-]{2,50}$/.test(target);
+    let validVideoLink = false;
+    if (item.type !== 'Seguidores' && target) {
+      try {
+        const url = new URL(target);
+        validVideoLink = url.protocol === 'http:' || url.protocol === 'https:';
+      } catch {
+        validVideoLink = false;
+      }
+    }
+    if (!allowedNetworks.has(item.network) || !Number.isInteger(amount) || amount < 100 || amount > 10_000_000 || !allowedTypes[item.type] || (!validUsername && !validVideoLink)) {
       throw new Error('El pedido contiene un servicio inválido.');
     }
     const regular = Math.round((amount / 10000) * allowedTypes[item.type]);
-    return total + (regular > 9000 ? Math.round(regular * 0.7) : regular);
+    return sum + (regular > 12000 ? Math.round(regular * 0.7) : regular);
   }, 0);
+  if (total < 500) throw new Error('La compra mínima es de $5.00.');
+  return total;
 }
 
 function setSession(response, userId) {

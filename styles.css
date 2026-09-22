@@ -1157,3 +1157,205 @@ body {
   .support-button small { line-height: 1.25; }
   .benefits { gap: 12px 8px; }
 }
+
+/* Premium visual polish */
+:root {
+  --surface-glass: rgba(17, 10, 54, 0.72);
+  --surface-border: rgba(255, 255, 255, 0.16);
+  --accent-pink: #ff3bc7;
+  --accent-cyan: #36e5ff;
+}
+
+body {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(255, 0, 174, 0.34), transparent 28%),
+    radial-gradient(circle at 94% 12%, rgba(0, 203, 255, 0.28), transparent 27%),
+    radial-gradient(circle at 84% 86%, rgba(92, 0, 255, 0.3), transparent 32%),
+    linear-gradient(135deg, #070016 0%, #120331 48%, #06182e 100%);
+}
+
+body::after {
+  background:
+    linear-gradient(115deg, transparent 15%, rgba(255, 255, 255, 0.05) 42%, transparent 58%),
+    radial-gradient(ellipse at center, transparent 38%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+.app-shell {
+  padding-bottom: 28px;
+}
+
+.topbar {
+  position: sticky;
+  top: 12px;
+  z-index: 6;
+  min-height: 58px;
+  padding: 10px 12px 10px 14px;
+  border: 1px solid var(--surface-border);
+  border-radius: 18px;
+  background: rgba(8, 4, 28, 0.68);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  letter-spacing: -0.05em;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 20px rgba(255, 0, 147, 0.45);
+}
+
+.cart-button,
+.music-button,
+.language-button {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.cart-button:hover,
+.music-button:hover,
+.language-button:hover {
+  border-color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.intro {
+  min-height: 430px;
+}
+
+.intro-title {
+  letter-spacing: -0.055em;
+}
+
+.intro-text {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.intro-highlights span {
+  padding: 9px 12px 9px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.platforms {
+  margin: 0 auto 18px;
+  padding: 24px 22px 20px;
+  border: 1px solid var(--surface-border);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.network-grid {
+  gap: 18px;
+}
+
+.network-button,
+.support-button {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.025)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 18px 34px rgba(0, 0, 0, 0.2), 0 0 14px rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.network-button::after,
+.support-button::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.11) 48%, transparent 70%);
+  content: "";
+  pointer-events: none;
+  transform: translateX(-120%);
+  transition: transform 0.55s ease;
+}
+
+.network-button:hover::after,
+.support-button:hover::after {
+  transform: translateX(120%);
+}
+
+.network-button em,
+.support-button em {
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+}
+
+.shop-panel {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: linear-gradient(145deg, rgba(22, 10, 63, 0.96), rgba(7, 4, 29, 0.97));
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.62), 0 0 36px rgba(54, 229, 255, 0.12);
+  backdrop-filter: blur(20px);
+}
+
+.custom-order {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.custom-order input {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+}
+
+.custom-order input:focus,
+#order-target:focus {
+  border-color: var(--accent-cyan);
+  outline: 3px solid rgba(54, 229, 255, 0.18);
+}
+
+.add-custom-order,
+.checkout,
+.receipt-button,
+.cashapp-button {
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-custom-order:hover,
+.checkout:hover,
+.receipt-button:hover,
+.cashapp-button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.2);
+}
+
+.real-followers-badge {
+  animation: badge-bounce 1.8s ease-in-out infinite, badge-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes badge-glow {
+  0%, 100% { box-shadow: 0 3px 12px rgba(255, 190, 0, 0.28); }
+  50% { box-shadow: 0 4px 20px rgba(255, 210, 31, 0.64); }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    position: relative;
+    top: 0;
+  }
+
+  .platforms {
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
