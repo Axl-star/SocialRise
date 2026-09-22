@@ -8,6 +8,15 @@ npm start
 
 Después abre `http://localhost:4173` o, en la misma red local, la IP mostrada en la terminal, por ejemplo `http://192.168.1.20:4173`.
 
+La página para descargar el video está disponible en `/descargar-video.html`, por ejemplo:
+`http://192.168.1.20:4173/descargar-video.html`.
+
+El servidor usa por defecto `/home/blackhat/Descargas/09220040-jtn_final_video_4k.mp4`. Para usar otro archivo:
+
+```bash
+SOCIALRISE_VIDEO_FILE="/ruta/al/video.mp4" npm start
+```
+
 Si quieres forzar la interfaz de red, puedes arrancarlo con:
 
 ```bash

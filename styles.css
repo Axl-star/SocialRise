@@ -1041,6 +1041,7 @@ body {
 .network-button.youtube em { background: linear-gradient(90deg, #ff003d, #ff4a00); }
 .network-button.instagram { grid-column: 1; }
 .network-button.youtube { grid-column: 1 / span 2; }
+.network-button.x { color: #ffffff; }
 
 .support-button {
   grid-column: 3;

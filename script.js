@@ -71,7 +71,7 @@ const translations = {
     targetVideoInvalid: 'Escribe un enlace válido que empiece por http:// o https://.',
     budgetInvalid: 'Escribe una cantidad válida usando solo números.',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
-    quantity: 'Compra mínima', minimumQuantityLabel: 'Compra mínima', minimumFollowers: '500 mín.', estimatedQuantity: 'Cantidad', realFollowers: 'Seguidores reales · 0 caídas', baseRate: '10.000 por $100 · $1,00 por cada 100', likesRate: '10.000 Likes por $50 · $0,50 por cada 100', viewsRate: '10.000 vistas por $50 · $0,50 por cada 100', discount: 'Descuento automático',
+    quantity: 'Compra mínima', minimumQuantityLabel: 'Compra mínima', minimumFollowers: '500 mín.', estimatedQuantity: 'Cantidad', realFollowers: 'Seguidores reales · 0 caídas', baseRate: '10.000 por $100 · $1,00 por cada 100', xFollowersRate: '10.000 por $200 · $2,00 por cada 100', likesRate: '10.000 Likes por $50 · $0,50 por cada 100', viewsRate: '10.000 vistas por $50 · $0,50 por cada 100', discount: 'Descuento automático',
     discountFrom: 'desde', serviceAdded: 'Servicio añadido al carrito',
     emptyCart: 'Tu carrito está vacío.', addPackage: 'Agrega al menos un paquete al carrito.', cartAdded: 'Se añadió al carrito:',
     priceFor: 'Precio para tu pedido', regularPrice: 'Precio regular', youSave: 'Ahorras',
@@ -103,7 +103,7 @@ const translations = {
     targetVideoInvalid: 'Enter a valid link starting with http:// or https://.',
     budgetInvalid: 'Enter a valid amount using numbers only.',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
-    quantity: 'Minimum purchase', minimumQuantityLabel: 'Minimum purchase', minimumFollowers: '500 min.', estimatedQuantity: 'Quantity', realFollowers: 'Real followers · 0 drops', baseRate: '10,000 for $100 · $1.00 per 100', likesRate: '10,000 Likes for $50 · $0.50 per 100', viewsRate: '10,000 views for $50 · $0.50 per 100', discount: 'Automatic discount',
+    quantity: 'Minimum purchase', minimumQuantityLabel: 'Minimum purchase', minimumFollowers: '500 min.', estimatedQuantity: 'Quantity', realFollowers: 'Real followers · 0 drops', baseRate: '10,000 for $100 · $1.00 per 100', xFollowersRate: '10,000 for $200 · $2.00 per 100', likesRate: '10,000 Likes for $50 · $0.50 per 100', viewsRate: '10,000 views for $50 · $0.50 per 100', discount: 'Automatic discount',
     discountFrom: 'from', serviceAdded: 'Service added to cart',
     emptyCart: 'Your cart is empty.', addPackage: 'Add at least one package to the cart.', cartAdded: 'Added to cart:',
     priceFor: 'Your order price', regularPrice: 'Regular price', youSave: 'You save',
@@ -173,6 +173,7 @@ function showCartToast(message) {
 function getRateDescription(type) {
   if (type === 'Vistas') return t('viewsRate');
   if (type === 'Likes') return t('likesRate');
+  if (selectedNetwork === 'X') return t('xFollowersRate');
   return t('baseRate');
 }
 
@@ -181,12 +182,20 @@ function getRegularPrice(amount, type) {
     ? likesBasePrice
     : type === 'Vistas'
       ? viewsBasePrice
-      : followersBasePrice;
+      : selectedNetwork === 'X'
+        ? followersBasePrice * 2
+        : followersBasePrice;
   return (amount / baseUnits) * unitPrice;
 }
 
 function getUnitPrice(type) {
-  return type === 'Likes' ? likesBasePrice : type === 'Vistas' ? viewsBasePrice : followersBasePrice;
+  return type === 'Likes'
+    ? likesBasePrice
+    : type === 'Vistas'
+      ? viewsBasePrice
+      : selectedNetwork === 'X'
+        ? followersBasePrice * 2
+        : followersBasePrice;
 }
 
 function getAmountForBudget(budget, type) {

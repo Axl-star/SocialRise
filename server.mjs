@@ -154,7 +154,7 @@ function cents(value) {
 function calculateOrderCents(items) {
   if (!Array.isArray(items) || !items.length || items.length > 30) throw new Error('El pedido no es válido.');
   const allowedTypes = { Seguidores: 10000, Likes: 5000, Vistas: 5000 };
-  const allowedNetworks = new Set(['Instagram', 'TikTok', 'Facebook', 'YouTube']);
+  const allowedNetworks = new Set(['Instagram', 'TikTok', 'Facebook', 'YouTube', 'X']);
   const total = items.reduce((sum, item) => {
     const amount = Number(item.amount);
     const target = typeof item.target === 'string' ? item.target.trim() : '';
@@ -171,7 +171,8 @@ function calculateOrderCents(items) {
     if (!allowedNetworks.has(item.network) || !Number.isInteger(amount) || amount < 100 || amount > 10_000_000 || !allowedTypes[item.type] || (!validUsername && !validVideoLink)) {
       throw new Error('El pedido contiene un servicio inválido.');
     }
-    const regular = Math.round((amount / 10000) * allowedTypes[item.type]);
+    const networkMultiplier = item.network === 'X' && item.type === 'Seguidores' ? 2 : 1;
+    const regular = Math.round((amount / 10000) * allowedTypes[item.type] * networkMultiplier);
     return sum + (regular > 12000 ? Math.round(regular * 0.7) : regular);
   }, 0);
   if (total < 500) throw new Error('La compra mínima es de $5.00.');
