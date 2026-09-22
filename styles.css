@@ -1228,10 +1228,17 @@ body::after {
 
 .intro {
   min-height: 430px;
+  padding-right: 0;
 }
 
 .intro-title {
   letter-spacing: -0.055em;
+}
+
+/* Keep the central brand area clean: the service cards already provide the
+   platform logos without competing with the main message. */
+.hero-art {
+  display: none;
 }
 
 .intro-text {
@@ -1346,6 +1353,10 @@ body::after {
 
   .platforms {
     padding-inline: 14px;
+  }
+
+  .intro {
+    min-height: 390px;
   }
 }
 

@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { createReadStream } from 'node:fs';
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import { createHash, randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
@@ -10,6 +11,7 @@ import { DatabaseSync } from 'node:sqlite';
 const scrypt = promisify(scryptCallback);
 const root = fileURLToPath(new URL('.', import.meta.url));
 const dataDirectory = join(root, 'data');
+const videoFile = process.env.SOCIALRISE_VIDEO_FILE || '/home/blackhat/Descargas/09220040-jtn_final_video_4k.mp4';
 await mkdir(dataDirectory, { recursive: true });
 const db = new DatabaseSync(join(dataDirectory, 'socialrise.sqlite'));
 
@@ -302,7 +304,44 @@ async function handleApi(request, response, url) {
 const contentTypes = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.jpeg': 'image/jpeg', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+  '.mp4': 'video/mp4',
 };
+
+async function serveVideo(request, response, download = false) {
+  const videoStats = await stat(videoFile);
+  const range = request.headers.range;
+  const commonHeaders = {
+    'Accept-Ranges': 'bytes',
+    'Content-Type': 'video/mp4',
+    'Cache-Control': 'public, max-age=3600',
+    ...(download ? { 'Content-Disposition': 'attachment; filename="socialrise-video-4k.mp4"' } : {}),
+  };
+
+  if (!range) {
+    response.writeHead(200, { ...commonHeaders, 'Content-Length': videoStats.size });
+    if (request.method === 'HEAD') return response.end();
+    return createReadStream(videoFile).pipe(response);
+  }
+
+  const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+  if (!match) {
+    response.writeHead(416, { 'Content-Range': `bytes */${videoStats.size}` });
+    return response.end();
+  }
+  const start = match[1] ? Number(match[1]) : Math.max(videoStats.size - Number(match[2]), 0);
+  const end = match[2] ? Number(match[2]) : videoStats.size - 1;
+  if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || start > end || end >= videoStats.size) {
+    response.writeHead(416, { 'Content-Range': `bytes */${videoStats.size}` });
+    return response.end();
+  }
+  response.writeHead(206, {
+    ...commonHeaders,
+    'Content-Length': end - start + 1,
+    'Content-Range': `bytes ${start}-${end}/${videoStats.size}`,
+  });
+  if (request.method === 'HEAD') return response.end();
+  return createReadStream(videoFile, { start, end }).pipe(response);
+}
 
 async function serveStatic(response, pathname) {
   const requested = pathname === '/' ? 'index.html' : decodeURIComponent(pathname).replace(/^\/+/, '');
@@ -322,6 +361,8 @@ const server = createServer(async (request, response) => {
   try {
     if (url.pathname.startsWith('/api/')) return await handleApi(request, response, url);
     if (request.method !== 'GET' && request.method !== 'HEAD') return json(response, 405, { error: 'Método no permitido.' });
+    if (url.pathname === '/media/socialrise-video.mp4') return await serveVideo(request, response);
+    if (url.pathname === '/download/socialrise-video.mp4') return await serveVideo(request, response, true);
     return await serveStatic(response, url.pathname);
   } catch (error) {
     console.error(error);
