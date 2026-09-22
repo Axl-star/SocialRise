@@ -153,7 +153,7 @@ function cents(value) {
 
 function calculateOrderCents(items) {
   if (!Array.isArray(items) || !items.length || items.length > 30) throw new Error('El pedido no es válido.');
-  const allowedTypes = { Seguidores: 12000, Likes: 5500, Vistas: 6000 };
+  const allowedTypes = { Seguidores: 10000, Likes: 5000, Vistas: 5000 };
   const allowedNetworks = new Set(['Instagram', 'TikTok', 'Facebook', 'YouTube']);
   const total = items.reduce((sum, item) => {
     const amount = Number(item.amount);
