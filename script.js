@@ -28,8 +28,9 @@ const backgroundMusic = document.querySelector('#background-music');
 const languageToggle = document.querySelector('#language-toggle');
 const baseUnits = 10000;
 const minimumPurchase = 5;
-const basePrice = 120;
+const followersBasePrice = 100;
 const likesBasePrice = 55;
+const viewsBasePrice = 60;
 const orderDiscountThreshold = 120;
 const orderDiscountPercentage = 30;
 const viewsPriceMultiplier = 0.5;
@@ -70,7 +71,7 @@ const translations = {
     targetVideoInvalid: 'Escribe un enlace válido que empiece por http:// o https://.',
     budgetInvalid: 'Escribe una cantidad válida usando solo números.',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
-    quantity: 'Cantidad que quieres', estimatedQuantity: 'Cantidad', realFollowers: 'Seguidores reales · 0 caídas', baseRate: '10.000 por $120 · $1,20 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $60 · $0,60 por cada 100', discount: 'Descuento automático',
+    quantity: 'Cantidad que quieres', minimumQuantityLabel: 'Compra mínima 500', minimumFollowers: '500 mín.', estimatedQuantity: 'Cantidad', realFollowers: 'Seguidores reales · 0 caídas', baseRate: '10.000 por $100 · $1,00 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $60 · $0,60 por cada 100', discount: 'Descuento automático',
     discountFrom: 'desde', serviceAdded: 'Servicio añadido al carrito',
     emptyCart: 'Tu carrito está vacío.', addPackage: 'Agrega al menos un paquete al carrito.', cartAdded: 'Se añadió al carrito:',
     priceFor: 'Precio para tu pedido', regularPrice: 'Precio regular', youSave: 'Ahorras',
@@ -102,7 +103,7 @@ const translations = {
     targetVideoInvalid: 'Enter a valid link starting with http:// or https://.',
     budgetInvalid: 'Enter a valid amount using numbers only.',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
-    quantity: 'Quantity you want', estimatedQuantity: 'Quantity', realFollowers: 'Real followers · 0 drops', baseRate: '10,000 for $120 · $1.20 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $60 · $0.60 per 100', discount: 'Automatic discount',
+    quantity: 'Quantity you want', minimumQuantityLabel: 'Minimum purchase 500', minimumFollowers: '500 min.', estimatedQuantity: 'Quantity', realFollowers: 'Real followers · 0 drops', baseRate: '10,000 for $100 · $1.00 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $60 · $0.60 per 100', discount: 'Automatic discount',
     discountFrom: 'from', serviceAdded: 'Service added to cart',
     emptyCart: 'Your cart is empty.', addPackage: 'Add at least one package to the cart.', cartAdded: 'Added to cart:',
     priceFor: 'Your order price', regularPrice: 'Regular price', youSave: 'You save',
@@ -179,13 +180,13 @@ function getRegularPrice(amount, type) {
   const unitPrice = type === 'Likes'
     ? likesBasePrice
     : type === 'Vistas'
-      ? basePrice * viewsPriceMultiplier
-      : basePrice;
+      ? viewsBasePrice
+      : followersBasePrice;
   return (amount / baseUnits) * unitPrice;
 }
 
 function getUnitPrice(type) {
-  return type === 'Likes' ? likesBasePrice : type === 'Vistas' ? basePrice * viewsPriceMultiplier : basePrice;
+  return type === 'Likes' ? likesBasePrice : type === 'Vistas' ? viewsBasePrice : followersBasePrice;
 }
 
 function getAmountForBudget(budget, type) {
@@ -267,7 +268,7 @@ function renderShop() {
     <div class="custom-order">
       <div class="quantity-price-row">
         <div class="quantity-field">
-          <label for="service-quantity">${t('quantity')} (${typeLabel(selectedType)})</label>
+          <label for="service-quantity">${selectedType === 'Seguidores' ? t('minimumQuantityLabel') : t('quantity')}</label>
           <div class="quantity-control">
             <input id="service-quantity" type="text" value="${getMinimumAmount(selectedType)}" inputmode="numeric" autocomplete="off" aria-describedby="quantity-help" />
             <span>${typeLabel(selectedType)}</span>
@@ -278,13 +279,13 @@ function renderShop() {
           <strong id="calculated-price">${money(getPrice(getMinimumAmount(selectedType), selectedType))}</strong>
         </div>
       </div>
-      <small id="quantity-help" class="quantity-help">${t('minimumQuantity')} · ${getRateDescription(selectedType)}</small>
+      <small id="quantity-help" class="quantity-help">${selectedType === 'Seguidores' ? t('minimumFollowers') : t('minimumQuantity')} · ${getRateDescription(selectedType)}</small>
       ${selectedType === 'Seguidores' ? `<div class="real-followers-badge">${t('realFollowers')}</div>` : ''}
       <label for="service-target">${targetField(selectedType).label}</label>
       <input id="service-target" type="${selectedType === 'Seguidores' ? 'text' : 'url'}" placeholder="${targetField(selectedType).placeholder}" autocomplete="off" required />
       <small id="target-help" class="quantity-help">${targetField(selectedType).help}</small>
       <div class="price-details">
-        <span>${t('regularPrice')} <b id="regular-price">${money(getRegularPrice(getAmountForBudget(minimumPurchase, selectedType), selectedType))}</b></span>
+        <span>${t('regularPrice')} <b id="regular-price">${money(getRegularPrice(getMinimumAmount(selectedType), selectedType))}</b></span>
         <span id="saving-line" hidden>${t('youSave')} <b id="saving-price">$0.00 USD</b></span>
       </div>
       <small class="discount-note" id="discount-note">${t('discount')}: 0% · ${t('discountTiers')}</small>

@@ -684,6 +684,7 @@ h1 {
   position: relative;
 }
 .quantity-control input { padding-right: 86px; }
+.quantity-control input { color: #159447; }
 .quantity-control span {
   position: absolute;
   top: 50%;
@@ -713,7 +714,7 @@ h1 {
   font-weight: 900;
   letter-spacing: 0.02em;
   box-shadow: 0 3px 12px rgba(255, 190, 0, 0.28);
-  animation: badge-bounce 1.8s ease-in-out infinite;
+  animation: none;
 }
 @keyframes badge-bounce {
   0%, 100% { transform: translateY(0) rotate(-1deg); }
@@ -1366,7 +1367,7 @@ body::after {
 }
 
 .real-followers-badge {
-  animation: badge-bounce 1.8s ease-in-out infinite, badge-glow 2.4s ease-in-out infinite;
+  animation: none;
 }
 
 @keyframes badge-glow {
