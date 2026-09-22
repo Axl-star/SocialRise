@@ -4,6 +4,7 @@ import { createHash, randomBytes, scrypt as scryptCallback, timingSafeEqual } fr
 import { promisify } from 'node:util';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { networkInterfaces } from 'node:os';
 import { DatabaseSync } from 'node:sqlite';
 
 const scrypt = promisify(scryptCallback);
@@ -316,4 +317,17 @@ const server = createServer(async (request, response) => {
 });
 
 const port = Number(process.env.PORT || 4173);
-server.listen(port, () => console.log(`SocialRise listo en http://localhost:${port}`));
+const host = process.env.HOST || '0.0.0.0';
+const localIps = Object.values(networkInterfaces())
+  .flat()
+  .filter((detail) => detail && detail.family === 'IPv4' && !detail.internal)
+  .map((detail) => detail.address);
+
+server.listen(port, host, () => {
+  console.log(`SocialRise listo en http://localhost:${port}`);
+  if (localIps.length) {
+    for (const ip of localIps) console.log(`Red local: http://${ip}:${port}`);
+  } else {
+    console.log(`Red local: http://TU_IP_LOCAL:${port}`);
+  }
+});

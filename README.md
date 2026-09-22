@@ -6,7 +6,13 @@ Ejecuta la aplicación con:
 npm start
 ```
 
-Después abre `http://localhost:4173`.
+Después abre `http://localhost:4173` o, en la misma red local, la IP mostrada en la terminal, por ejemplo `http://192.168.1.20:4173`.
+
+Si quieres forzar la interfaz de red, puedes arrancarlo con:
+
+```bash
+HOST=0.0.0.0 PORT=4173 npm start
+```
 
 La base de datos SQLite se crea automáticamente en `data/socialrise.sqlite`. El navegador nunca recibe contraseñas, saldos ni permisos de administración: esas operaciones se validan en el backend.
 

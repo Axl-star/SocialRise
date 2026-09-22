@@ -61,6 +61,12 @@ const translations = {
     paypalCopy: 'Escanea este código QR con la cámara o la app de PayPal para enviar el total.',
     scanQr: 'Escanea el código QR',
     chooseService: 'Selecciona un servicio', followers: 'Seguidores', likes: 'Likes', views: 'Vistas',
+    targetUsername: 'Usuario de la red social', targetVideoLink: 'Enlace del video',
+    targetUsernameHelp: 'Escribe el usuario al que enviaremos los seguidores.',
+    targetVideoHelp: 'Pega el enlace completo del video para recibir likes o vistas.',
+    targetRequired: 'Completa el usuario o enlace antes de continuar.',
+    targetUsernameInvalid: 'Escribe un usuario válido de la red social.',
+    targetVideoInvalid: 'Escribe un enlace válido que empiece por http:// o https://.',
     quickBuy: 'Compra rápida', addToCart: 'Añadir al carrito', remove: 'Eliminar',
     quantity: '¿Cuántos quieres?', baseRate: '10.000 por $90 · $0,90 por cada 100', likesRate: '10.000 Likes por $55 · $0,55 por cada 100', viewsRate: '10.000 vistas por $45 · $0,45 por cada 100', discount: 'Descuento automático',
     discountFrom: 'desde', serviceAdded: 'Servicio añadido al carrito',
@@ -86,6 +92,12 @@ const translations = {
     paypalCopy: 'Scan this QR code with your camera or the PayPal app to send the total.',
     scanQr: 'Scan the QR code',
     chooseService: 'Choose a service', followers: 'Followers', likes: 'Likes', views: 'Views',
+    targetUsername: 'Social media username', targetVideoLink: 'Video link',
+    targetUsernameHelp: 'Enter the username that should receive the followers.',
+    targetVideoHelp: 'Paste the full video link for likes or views.',
+    targetRequired: 'Complete the username or link before continuing.',
+    targetUsernameInvalid: 'Enter a valid social media username.',
+    targetVideoInvalid: 'Enter a valid link starting with http:// or https://.',
     quickBuy: 'Quick purchase', addToCart: 'Add to cart', remove: 'Remove',
     quantity: 'How many do you want?', baseRate: '10,000 for $90 · $0.90 per 100', likesRate: '10,000 Likes for $55 · $0.55 per 100', viewsRate: '10,000 views for $45 · $0.45 per 100', discount: 'Automatic discount',
     discountFrom: 'from', serviceAdded: 'Service added to cart',
@@ -125,10 +137,9 @@ function updateMusicButton() {
 }
 
 function startMusic() {
-  backgroundMusic.volume = 0.35;
-  backgroundMusic.muted = false;
-  backgroundMusic.play().catch(() => {
-    backgroundMusic.muted = true;
+  backgroundMusic.volume = 0.28;
+  backgroundMusic.play().catch((error) => {
+    console.warn('La música se activará al pulsar el botón de música.', error);
   });
 }
 
@@ -179,6 +190,26 @@ function getPrice(amount, type) {
   return getRegularPrice(amount, type) * (1 - discount / 100);
 }
 
+function targetField(type) {
+  const isFollowers = type === 'Seguidores';
+  return {
+    label: isFollowers ? t('targetUsername') : t('targetVideoLink'),
+    help: isFollowers ? t('targetUsernameHelp') : t('targetVideoHelp'),
+    placeholder: isFollowers ? '@usuario' : 'https://...',
+  };
+}
+
+function isValidTarget(target, type) {
+  if (!target) return false;
+  if (type === 'Seguidores') return /^@?[a-zA-Z0-9._-]{2,50}$/.test(target);
+  try {
+    const url = new URL(target);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 function paymentMethodName(method = selectedPaymentMethod) {
   return method === 'binance' ? 'Binance BNB' : method === 'paypal' ? 'PayPal' : 'Cash App';
 }
@@ -225,6 +256,9 @@ function renderShop() {
         <span>${t('units')}</span>
       </div>
       <small id="quantity-help" class="quantity-help">${t('minimumQuantity')} · ${getRateDescription(selectedType)}</small>
+      <label for="service-target">${targetField(selectedType).label}</label>
+      <input id="service-target" type="${selectedType === 'Seguidores' ? 'text' : 'url'}" placeholder="${targetField(selectedType).placeholder}" autocomplete="off" required />
+      <small id="target-help" class="quantity-help">${targetField(selectedType).help}</small>
       <div class="price-summary">
         <span>${t('priceFor')}</span>
         <strong id="calculated-price">${money(getPrice(baseUnits, selectedType))}</strong>
@@ -256,6 +290,7 @@ function renderShop() {
   });
 
   const quantityInput = shopPanel.querySelector('#service-quantity');
+  const targetInput = shopPanel.querySelector('#service-target');
   const calculatedPrice = shopPanel.querySelector('#calculated-price');
   const regularPrice = shopPanel.querySelector('#regular-price');
   const savingLine = shopPanel.querySelector('#saving-line');
@@ -276,13 +311,25 @@ function renderShop() {
   quantityInput.addEventListener('input', updatePrice);
   shopPanel.querySelector('.add-custom-order').addEventListener('click', () => {
     const amount = Math.floor(Number(quantityInput.value) || 0);
+    const target = targetInput.value.trim();
     if (amount < 100) {
       quantityInput.setCustomValidity('La cantidad mínima es 100.');
       quantityInput.reportValidity();
       return;
     }
+    if (!target) {
+      targetInput.setCustomValidity(t('targetRequired'));
+      targetInput.reportValidity();
+      return;
+    }
+    if (!isValidTarget(target, selectedType)) {
+      targetInput.setCustomValidity(selectedType === 'Seguidores' ? t('targetUsernameInvalid') : t('targetVideoInvalid'));
+      targetInput.reportValidity();
+      return;
+    }
     quantityInput.setCustomValidity('');
-    cart.push({ network: selectedNetwork, type: selectedType, amount, price: getPrice(amount, selectedType) });
+    targetInput.setCustomValidity('');
+    cart.push({ network: selectedNetwork, type: selectedType, amount, target, price: getPrice(amount, selectedType) });
     renderCart();
     showCartToast(`${t('cartAdded')} ${typeLabel(selectedType)}`);
   });
@@ -311,7 +358,7 @@ function renderCart() {
     <div class="cart-item">
       <div>
         <strong>${item.network} · ${item.amount.toLocaleString('en-US')} ${typeLabel(item.type)}</strong>
-        <small>${money(item.price)}</small>
+        <small>${money(item.price)} · ${item.target}</small>
       </div>
       <button class="cart-remove" type="button" data-index="${index}">${t('remove')}</button>
     </div>
@@ -367,9 +414,12 @@ paymentMethodButtons.forEach((button) => {
 });
 
 function orderMessage() {
-  const summary = cart.map((item) => `${item.network}: ${item.amount.toLocaleString('en-US')} ${item.type} - ${money(item.price)}`).join('\n');
+  const summary = cart.map((item) => {
+    const destinationLabel = item.type === 'Seguidores' ? 'Usuario' : 'Enlace del video';
+    return `${item.network}: ${item.amount.toLocaleString('en-US')} ${item.type} - ${money(item.price)}\n${destinationLabel}: ${item.target}`;
+  }).join('\n');
   const total = cart.reduce((sum, item) => sum + item.price, 0);
-  return `Hola SocialRise, ya realicé el pago por ${paymentMethodName()} de mi pedido:\n${summary}\nTotal enviado: ${money(total)}\nMi usuario/enlace: `;
+  return `Hola SocialRise, ya realicé el pago por ${paymentMethodName()} de mi pedido:\n${summary}\nTotal enviado: ${money(total)}`;
 }
 
 receiptButton.addEventListener('click', () => {
@@ -385,7 +435,6 @@ if (musicPlaying) {
   startMusic();
   const resumeSavedMusic = () => {
     if (musicPlaying) {
-      backgroundMusic.muted = false;
       startMusic();
     }
     document.removeEventListener('pointerdown', resumeSavedMusic);
